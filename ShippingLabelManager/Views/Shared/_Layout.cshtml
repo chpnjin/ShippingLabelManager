@@ -1,0 +1,47 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>出貨標籤管理系統</title>
+    <script src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js"></script>
+    @* 引用在\App_Start\BundleConfig.cs定義的資源檔 *@
+    @Styles.Render("~/css/AllPage")
+    @Scripts.Render("~/js/jQuery")
+    @Scripts.Render("~/js/jsbarcode")
+    @Scripts.Render("~/js/qrcode")
+    @Scripts.Render("~/js/rulez")
+    @Scripts.Render("~/js/svgjs")
+    @Scripts.Render("~/js/canvg")
+    @Scripts.Render("~/js/select2")
+</head>
+<body id="_Layout">
+    <header>
+        <span id="title">出貨標籤管理系統</span>
+        <span id="loginUser"></span>
+    </header>
+    <nav>
+        <ul id="navbar">
+            <li>@Html.ActionLink("查詢格式", "Inquery", "MainPage", null, new { id = "Inquery" })</li>
+            <li>@Html.ActionLink("編輯格式", "Edit", "MainPage", null, new { id = "Edit" })</li>
+            <li>@Html.ActionLink("列印", "Print", "MainPage", null, new { id = "Print" })</li>
+            <li>@Html.ActionLink("設定", "Settings", "MainPage", null, new { id = "Settings" })</li>
+            <li>@Html.ActionLink("離開", "Exit", "MainPage", null, new { id = "Exit" })</li>
+        </ul>
+    </nav>
+    <div id="content">
+        @RenderBody()
+    </div>
+    <footer>
+        <span>Copyright © Kinsun Industries Inc Co., Ltd. 慶陞工業股份有限公司 桃園縣平鎮市關爺東路32號 TEL:03-4589558　FAX:03-4583958</span>
+        <span>2019 Kinsun All Rights Reserved</span>DD
+    </footer>
+    <script>
+        //jQuery Start
+        $(function () {
+            
+        });//jQuery End
+    </script>
+</body>
+</html>

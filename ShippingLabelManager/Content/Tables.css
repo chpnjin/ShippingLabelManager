@@ -1,0 +1,36 @@
+﻿.fancytable {
+    border: 1px solid #cccccc;
+    border-collapse: collapse;
+}
+
+    .fancytable td {
+        border: 1px solid #cccccc;
+        color: #555555;
+        text-align: center;
+        line-height: 28px;
+    }
+/*表頭*/
+.headerRow {
+    background-color: #FDE890;
+}
+
+    .headerRow thead th tr {
+        text-align: center;
+    }
+
+/*奇數列*/
+.dataRowOdd {
+    background-color: #ffffff;
+}
+/*偶數列*/
+.dataRowEven {
+    background-color: #efefef;
+}
+
+.onMouseOver {
+    background-color: #FFCF8B
+}
+
+.selected {
+    background-color: #FFB8DF;
+}

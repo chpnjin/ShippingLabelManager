@@ -1,0 +1,48 @@
+﻿#print {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    height: inherit;
+}
+
+/*搜尋區*/
+#print_search {
+    flex-grow: 1;
+    flex-basis: 100px;
+    background-color: #fff8dc;
+}
+
+/*訂單列表*/
+#print_orderLists {
+    flex-grow: 1;
+    flex-basis: 600px;
+    background-color: #E8E4BC;
+    overflow: auto;
+}
+
+/*訂單列表固定表頭*/
+    #print_orderLists th {
+        position: sticky;
+        top: 0;
+        background-color: #FDE890;
+    }
+
+#table_orderList {
+    width: 100%;
+}
+
+/*標籤Layout*/
+#print_layout {
+    width: 900px;
+    flex-basis: 500px;
+}
+
+/*列印資訊區*/
+#print_info {
+    background-color: #FFECCF;
+    flex: 1;
+}
+
+#btnPrintSearch {
+    float: right;
+}

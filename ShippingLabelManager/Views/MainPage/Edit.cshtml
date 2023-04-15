@@ -1,0 +1,1338 @@
+﻿@{Layout = "~/Views/Shared/_Layout.cshtml";}
+
+<div id="edit_sidebar">
+    <fieldset class="groupBox">
+        <legend><span>管理</span></legend>
+        <table id="table_labelData" class="edit_table">
+            <colgroup>
+                <col class="table_col1">
+                <col class="table_col2">
+            </colgroup>
+            <tr>
+                <td>識別ID</td>
+                <td><input type="text" id="txtLabelId" /></td>
+            </tr>
+        </table>
+        <div class="editButtonGroup">
+            <input type="button" id="btnSaveLabel" value="儲存" />
+            <input type="button" id="btnLoadLabel" value="讀取" />
+            <input type="button" id="btnDeleteLabel" value="刪除" />
+            <input type="button" id="btnPrintLabel" value="樣本列印" />
+        </div>
+    </fieldset>
+    <p></p>
+    <!--標籤資料-->
+    <fieldset class="groupBox">
+        <legend><span>標籤資訊</span></legend>
+        <table id="table_labelInfo" class="edit_table">
+            <colgroup>
+                <col class="table_col1">
+                <col class="table_col2">
+            </colgroup>
+            <tr>
+                <td>標籤名稱</td>
+                <td colspan="3">
+                    <input type="text" id="txtLabelName" />
+                </td>
+            </tr>
+            <tr>
+                <td>對應客戶</td>
+                <td colspan="3">
+                    <select id="cboCustomerNo"></select>
+                </td>
+            </tr>
+            <tr>
+                <td>訂單單號</td>
+                <td colspan="3">
+                    <input type="text" id="txtOrderNo" />
+                </td>
+            </tr>
+            <tr>
+                <td><span>標籤尺寸</span></td>
+                <td>
+                    <select id="cboLabelSize">
+                        <option value="L" selected>大(100x60)</option>
+                        @*<option value="M">中(50x50)</option>
+                            <option value="S">小()</option>*@
+                    </select>
+                    <button id="btnResizeLabel" value="" />更新
+                </td>
+            </tr>
+            <tr>
+                <td>備註</td>
+                <td colspan="3"><input type="text" id="txtRemark" name="Remark" /></td>
+            </tr>
+            <tr>
+                <td>
+                    <span>元件清單</span>
+                </td>
+                <td>
+                    <button id="btnDeselectElement">清除選擇</button>
+                </td>
+            </tr>
+        </table>
+        <select size="10" id="labelElementsList"></select>
+    </fieldset>
+    <p></p>
+    <!--標籤元件編輯區塊-->
+    <fieldset class="groupBox">
+        <legend>標籤元件編輯</legend>
+        <table id="table_elementEditArea" class="edit_table">
+            <colgroup>
+                <col class="table_col1">
+                <col class="table_col2">
+            </colgroup>
+            <tr>
+                <td><span>元件名稱</span></td>
+                <td>
+                    <input type="text" id="txtElmId" />
+                </td>
+            </tr>
+            <tr>
+                <td><span>元件類型</span></td>
+                <td colspan="2">
+                    <select id="cboElType">
+                        <option value="text" selected>純文字</option>
+                        <option value="barcode">一維條碼</option>
+                        <option value="qrCode">二維條碼</option>
+                        <option value="markFrame">嘜頭外框(菱形)</option>
+                        <option value="image">圖片</option>
+                    </select>
+                </td>
+            </tr>
+            <tr id="rowRelationalData" class="elSettings">
+                <td>
+                    <span>關聯資料</span>
+                </td>
+                <td>
+                    <select id="cboRelationalData">
+                        <option value="none" selected>無(固定資料)</option>
+                        <option value="orderNo">訂單單號</option>
+                        <option value="moNo">製令單號</option>
+                        <option value="customerPn">客戶料號</option>
+                        <option value="mfrPn">製造商料號</option>
+                        <option value="dateCode">日期代碼</option>
+                        <option value="lot">批號</option>
+                        <option value="qty">數量</option>
+                        <option value="pkgId">包裝ID</option>
+                    </select>
+                    <span class="dataLenght">長度</span>
+                    <input type="number" id="numDataLength" value="5" min="1" max="25" class="input_num dataLenght" />
+                    <span class="dataLenght">碼</span>
+                </td>
+            </tr>
+            <tr id="rowContent" class="elSettings">
+                <td>
+                    <span id="spanElementContentTitel">資料內容</span>
+                </td>
+                <td>
+                    <input type="text" id="txtElementContent" />
+                </td>
+            </tr>
+            <tr class="elSettings textSettings">
+                <td>字形</td>
+                <td>
+                    <select id="cboTextFontType">
+                        <option value="default" selected>預設</option>
+                    </select>
+                </td>
+            </tr>
+            <tr class="elSettings textSettings">
+                <td>字體大小</td>
+                <td><input type="number" value="10" min="5" id="numFontSize" class="input_num" /></td>
+            </tr>
+            <tr class="elSettings barcodeSettings">
+                <td>條碼格式</td>
+                <td>
+                    <select id="cboBarcodeFormat">
+                        <option value="CODE39" selected>Code 39</option>
+                        <option value="CODE128">Code 128</option>
+                    </select>
+                </td>
+            </tr>
+            <tr class="elSettings barcodeSettings">
+                <td>條碼高度</td>
+                <td>
+                    <input type="number" id="numBarcodeHeight" value="2" min="1" max="10" class="input_num" />
+                </td>
+            </tr>
+            <tr class="elSettings barcodeSettings">
+                <td>顯示文字</td>
+                <td>
+                    <input type="checkbox" id="chkShowBarcodeText" />
+                    <input type="radio" class="barcodeTextPosition" name="barcodeTextPosition" value="top">上
+                    <input type="radio" class="barcodeTextPosition" name="barcodeTextPosition" value="bottom" checked>下
+                </td>
+            </tr>
+            <tr class="elSettings qrCodeSettings">
+                <td>尺寸(mm)</td>
+                <td><input type="number" value="10" min="5" step="5" id="numQrcodeSize" class="input_num" /></td>
+            </tr>
+            <tr class="elSettings markFrameSettings">
+                <td>尺寸(mm)</td>
+                <td>
+                    <span>寬</span><input type="number" min="1" max="100" value="1" id="numMarkFrameWidth" class="input_num" />
+                    <span>高</span><input type="number" min="1" max="60" value="1" id="numMarkFrameHeight" class="input_num" />
+                </td>
+            </tr>
+            <tr class="elSettings imageSettings">
+                <td>選擇圖片</td>
+                <td>
+                    <select id="cboImageSelector"></select>
+                </td>
+            </tr>
+            <tr class="elSettings imageSettings">
+                <td>尺寸(mm)</td>
+                <td>
+                    <span id="imageSize"></span>
+                </td>
+            </tr>
+            <tr class="elSettings imageSettings">
+                <td>預覽</td>
+                <td>
+                    <img id="edit_imagePreview" />
+                </td>
+            </tr>
+        </table>
+        <span class="elSettings barcodeSettings prompt">※條碼長度自動依資料長度調整</span>
+        <span class="elSettings qrCodeSettings prompt">※長寬比例固定為1:1</span>
+
+        <div id="elLocSettings">
+            <span>元件座標位置</span>
+            X：<input type="number" value="0" min="0" max="100" id="numElCoorX" class="input_num" />
+            Y：<input type="number" value="0" min="0" max="60" id="numElCoorY" class="input_num" />
+        </div>
+        <p></p>
+        <div class="editButtonGroup">
+            <input type="button" id="btnCreateEl" class="editBtn" value="新增" />
+            <input type="button" id="btnUptateEl" class="editBtn" value="修改" />
+            <input type="button" id="btnDelEl" class="editBtn" value="刪除" />
+        </div>
+    </fieldset>
+</div>
+<div id="edit_content">
+    <div id="unit">
+        <span>mm</span>
+    </div>
+    <svg id="rulerX"></svg>
+    <svg id="rulerY"></svg>
+    <svg id="labelLayout" xmlns="http://www.w3.org/2000/svg"></svg>
+</div>
+
+<script type="module">
+    import * as _ from "../../lib/tools.js";
+
+    let labelData; //標籤資料
+    let selectObjs; //選取區塊物件
+    const haveContentElementTypes = ["text", "barcode", "qrCode"];
+
+    //初始化標籤資料結構
+    function labelDataInit() {
+        labelData = {
+            "labelId": "",
+            "labelName": "",
+            "customerNo": "",
+            "orderNo": "",
+            "labelSize": "",
+            "remark": "",
+            "elements": [
+            ]
+        }
+    }
+
+    //生成標籤元件資料
+    function elementDataInit() {
+        let elementData = {
+            "elmId": "",
+            "type": "",
+            "content": "",
+            "relational": "",
+            "attributes": "",
+            "x": -1,
+            "y": -1,
+            "width": -1,
+            "height": -1,
+            "isQty": false,
+            "isSN": false
+        }
+        return elementData;
+    }
+
+    //清除SVG標籤中的所有資料
+    function clearSvgItems(svg) {
+        while (svg.lastChild) {
+            svg.removeChild(svg.lastChild);
+        }
+    }
+
+    //顯示尺規(單位:mm)
+    function showRuler() {
+        let rulerX = document.getElementById("rulerX");
+        let rulerY = document.getElementById("rulerY");
+        let hRulerWidth = parseInt(rulerX.style.width, 10);
+
+        clearSvgItems(rulerX);
+        clearSvgItems(rulerY);
+
+        //水平尺規
+        let rulezH = new Rulez({
+            element: rulerX,
+            layout: "horizontal",
+            alignment: "bottom",
+            divisions: [
+                {
+                    pixelGap: _.mm2px(1), //尺線間距(mm)
+                    lineLength: 5, //尺線長度(px)
+                    renderer: function (division) {
+                        //每10mm尺線加長
+                        if (division.x.baseVal.value % _.mm2px(10) == 0) {
+                            division.y.baseVal.value -= 5;
+                            division.height.baseVal.value += 5;
+                        }
+
+                        //0不畫線
+                        if (division.x.baseVal.value == 0) {
+                            division.height.baseVal.value = 0;
+                        }
+                    }
+                }
+            ],
+            texts: [
+                {
+                    pixelGap: _.mm2px(10),  //數字間隔(10 mm)
+                    offset: 12,   //文字垂直位置修正
+                    renderer: function (text) {
+                        //以mm為單位顯示文字
+                        text.textContent = text.textContent / 8;
+
+                        //0不顯示
+                        if (text.childNodes[0].data == "0") {
+                            text.childNodes[0].data = "";
+                        }
+                    }
+                }
+            ]
+        });
+        rulezH.render();
+
+        //垂直尺規
+        let rulezV = new Rulez({
+            element: rulerY,
+            layout: "vertical",
+            alignment: "right",
+            divisions: [
+                {
+                    pixelGap: _.mm2px(1), //尺線間距(mm)
+                    lineLength: 5, //尺線長度(px)
+                    renderer: function (division) {
+                        //每10mm尺線加長
+                        if (division.y.baseVal.value % _.mm2px(10) == 0) {
+                            division.x.baseVal.value -= 5;
+                            division.width.baseVal.value += 5;
+                        }
+
+                        //0不畫線
+                        if (division.y.baseVal.value == 0) {
+                            division.width.baseVal.value = 0;
+                        }
+                    }
+                }
+            ],
+            texts: [
+                {
+                    pixelGap: _.mm2px(10),  //數字間隔(10 mm)
+                    offset: 20,   //文字水平位置修正(px)
+                    renderer: function (text) {
+                        //以mm為單位顯示文字
+                        text.textContent = text.textContent / 8;
+                        //文字垂直位置修正
+                        var PosY = text.origPos;
+                        PosY += 5;
+                        text.setAttribute("y", PosY);
+
+                        //0不顯示
+                        if (text.childNodes[0].data == "0") {
+                            text.childNodes[0].data = "";
+                        }
+                    }
+                }
+            ]
+        });
+        rulezV.render();
+
+        //修正
+        hRulerWidth += 5;
+        rulerX.style.width = hRulerWidth + "px";
+    }
+
+    //jQuery Start
+    $(function () {
+        //頁面初始化
+        function pageInit() {
+            //填入值
+            $("#txtElCoorX").val(0);
+            $("#txtElCoorY").val(0);
+
+            //註冊事件
+            $("#btnSaveLabel").click(saveLabel);
+            $("#btnLoadLabel").click(loadLabel);
+            $("#btnDeleteLabel").click(deleteLabel);
+            $("#btnPrintLabel").click(printLabel);
+            $("#btnResizeLabel").click(btnResizeLabel_onclick);
+            $("#btnDeselectElement").click(btnDeselectElement_onclick);
+
+            $("#labelElementsList").change(labelElementsList_selectedChange);
+
+            $("#cboElType").change(cboElType_onchange);
+            $("#cboRelationalData").change(cboRelationalData_onchange);
+
+            $("#cboImageSelector").on("change", cboImageSelector_onchange);
+            $("#cboImageSelector").on("select2:select", cboImageSelector_onchange);
+
+            $("#numDataLength").change(numDataLength_onchange);
+
+            $(".editBtn").click(editButtons_onclick);
+            $(".elementOnLabel").click(elementOnLabel_onclick);
+
+            //動態渲染網格
+            $("#labelLayout").addClass("grid");
+
+            btnResizeLabel_onclick();
+            cboElType_onchange();
+            cboRelationalData_onchange();
+
+            dataInit();
+        }
+
+        //資料初始化
+        function dataInit() {
+            labelDataInit();
+            selectObjs = [];
+            loadCustomerList();
+            loadImageList();
+        }
+
+        //載入客戶清單
+        function loadCustomerList() {
+            let customers = [];
+
+            $.ajax({
+                type: "GET",
+                url: "/api/Data/GetCustomerList",
+                success: function (response) {
+                    $.each(response, function (idx, item) {
+                        customers.push(item);
+                    });
+
+                    $("#cboCustomerNo").select2({
+                        data: customers,
+                        placeholder: "請選擇客戶...",
+                        width: "100%",
+                        language: "zh-TW"
+                    });
+                }
+            });
+        }
+
+        //載入圖片資源清單(參數:預設選擇)
+        function loadImageList() {
+            let images = [];
+
+            $.ajax({
+                type: "GET",
+                url: "/api/Data/GetImageResourceList?forAutoComplete=true",
+                success: function (response) {
+                    $.each(response, function (idx, item) {
+                        images.push(item);
+                    });
+
+                    $("#cboImageSelector").select2({
+                        data: images,
+                        placeholder: "請輸入圖片名稱...",
+                        width: "100%",
+                        language: "zh-TW"
+                    });
+                }
+            });
+        }
+
+        //======================管理
+
+        //儲存標籤
+        async function saveLabel() {
+            let existLabelId = "";
+            let customerOfSearchResult = "";
+            let overwriteData = true;
+
+            labelData.labelId = $("#txtLabelId").val().trim();
+            labelData.labelName = $("#txtLabelName").val().trim();
+            labelData.customerNo = $("#cboCustomerNo").val();
+            labelData.orderNo = $("#txtOrderNo").val().trim();
+            labelData.labelSize = $("#cboLabelSize").val();
+            labelData.remark = $("#txtRemark").val();
+
+            if (labelData.labelId === "") { alert("請輸入識別ID"); return; }
+            if (labelData.labelName === "") { alert("請輸入標籤名稱"); return; }
+            if (labelData.customerNo === "") { alert("請選擇對應客戶"); return; }
+            if (labelData.labelSize === "") { alert("請選擇標籤尺寸"); return; }
+
+            //檢查是否已定義相同客戶
+            await $.get("/api/Data/GetLabelIdByCustomerAndOrderNo?customerNo=" + labelData.customerNo +
+                "&orderNo=" + labelData.orderNo, function (result) {
+                    existLabelId = result;
+                }
+            );
+
+            //當某客戶標籤已有設定時,提示已存的標籤ID
+            if (existLabelId != null) {
+                if (existLabelId != labelData.labelId) {
+                    alert("系統已有對應該客戶與訂單的標籤設定(識別ID:" + existLabelId + ")\n" +
+                        "若要依照訂單設計不同標籤請在輸入訂單單號後以不同識別ID重新儲存");
+                    return;
+                }
+            }
+
+            //檢查訂單編號是否屬於選取的客戶
+            if (labelData.orderNo != "") {
+                await $.get("/api/Data/GetCustomerByOrderNo?orderNo=" + labelData.orderNo,
+                    function (result) {
+                        customerOfSearchResult = result;
+                    }
+                );
+
+                if (customerOfSearchResult == null) {
+                    alert("訂單單號不存在,請確認後重新輸入");
+                    return;
+                }
+
+                if (customerOfSearchResult != labelData.customerNo) {
+                    alert("訂單單號不屬於該客戶,請確認後重新輸入");
+                    return;
+                }
+            }
+
+            //檢查輸入的識別ID是否已有資料
+            await $.post("/api/Data/LoadLabelData", { labelId: labelData.labelId },
+                function (data) {
+                    if (data[0].customerNo != labelData.customerNo ||
+                        data[0].orderNo != labelData.orderNo) {
+                        overwriteData = confirm("該識別ID已有儲存其他客戶資訊 \n" +
+                            "(標籤名稱:" + data[0].labelName +
+                            " / 客戶代號:" + data[0].customerNo +
+                            " / 訂單單號:" + data[0].orderNo + ")\n 請問是否覆蓋原有資料?");
+                    }
+                }
+            );
+
+            if (overwriteData == false) { return; }
+
+            $.ajax({
+                type: "PUT",
+                url: "/api/Data/PutLabel",
+                contentType: 'application/json',
+                data: JSON.stringify(labelData),
+                success: function (result) {
+                    if (result == true) {
+                        alert("儲存成功");
+                    } else {
+                        alert("儲存失敗");
+                    }
+                }
+            });
+        }
+
+        //讀取標籤
+        function loadLabel() {
+            let labelId;
+
+            labelId = $("#txtLabelId").val().trim();
+
+            if (labelId == "") { alert("請輸入識別ID"); return; }
+
+            resetLabelInfo();
+            resetElementEditArea();
+            clearAllElement();
+
+            //主檔
+            $.ajax({
+                type: "POST",
+                url: "/api/Data/LoadLabelData",
+                contentType: 'application/json',
+                data: JSON.stringify({ "labelId": labelId }),
+                success: function (data) {
+
+                    if (data.length == 0) {
+                        alert("查無資料");
+                        return;
+                    }
+
+                    labelData.labelId = labelId;
+                    labelData.labelName = data[0].labelName;
+                    labelData.customerNo = data[0].customerNo;
+                    labelData.orderNo = data[0].orderNo;
+                    labelData.labelSize = data[0].labelSize;
+                    labelData.remark = data[0].remark;
+
+                    $("#txtLabelName").val(labelData.labelName);
+                    changeSelectedCustomer(labelData.customerNo);
+                    $("#txtOrderNo").val(labelData.orderNo)
+                    $("#cboLabelSize").val(labelData.labelSize);
+                    $("#txtRemark").val(labelData.remark);
+                }
+            });
+            //元件清單
+            $.ajax({
+                type: "POST",
+                url: "/api/Data/LoadLabelElm",
+                contentType: 'application/json',
+                data: JSON.stringify({ "labelId": labelId }),
+                success: function (data) {
+
+                    if (data.length == 0) {
+                        return;
+                    }
+                    clearSvgItems(document.getElementById("labelLayout"));
+
+                    data.forEach(function (el) {
+                        el.attributes = JSON.parse(el.attributes);
+                        addElement(el);
+                    });
+
+                    btnDeselectElement_onclick();
+                }
+            });
+        }
+
+        //刪除標籤
+        function deleteLabel() {
+            let labelId, confirmDelete;
+
+            labelId = $("#txtLabelId").val().trim();
+
+            if (labelId == "") { alert("請輸入識別ID"); return; }
+
+            confirmDelete = confirm("確認刪除標籤:" + labelId + "?");
+
+            if (confirmDelete) {
+                $.ajax({
+                    type: "DELETE",
+                    url: "/api/Data/DeleteLabel",
+                    contentType: 'application/json',
+                    data: JSON.stringify({ "labelId": labelId }),
+                    success: function (result) {
+                        if (result == true) {
+                            alert("刪除成功");
+
+                            resetLabelInfo();
+                            resetElementEditArea();
+                            clearAllElement();
+                        } else {
+                            alert("刪除失敗");
+                        }
+                    }
+                });
+            }
+        }
+
+        //樣本列印
+        function printLabel() {
+            let svg, downloader;
+            let label = document.createElement("canvas");
+
+            btnDeselectElement_onclick();
+            $("#labelLayout").removeClass("grid");
+
+            svg = document.getElementById("labelLayout");
+
+            //SVG轉圖檔
+            canvg(label, svg.outerHTML);
+
+            setTimeout(function () {
+                if (label.msToBlob) { //for IE
+                    downloader = label.msToBlob();
+                    window.navigator.msSaveBlob(downloader, 'label.bmp');
+                } else {
+                    //other browsers
+                    downloader = document.createElement("a");
+                    downloader.href = label.toDataURL("image/bmp").replace("image/bmp", "image/octet-stream");
+                    downloader.download = "label.bmp";
+                    downloader.click();
+                }
+            }, 1000);
+
+            $("#labelLayout").addClass("grid");
+        }
+
+        //======================標籤資訊
+
+        //重置標籤訊息
+        function resetLabelInfo() {
+            $("#txtLabelName").val("");
+            $("#txtCustomerNo").val("");
+            $("#txtRemark").val("");
+
+            document.getElementById("cboLabelSize").selectedIndex = 0;
+        }
+
+        //變更選擇的客戶
+        async function changeSelectedCustomer(customerNo) {
+            let CustomerSelector = $("#cboCustomerNo");
+
+            //若已有則不新增
+            if ($("#cboCustomerNo option[value='" + customerNo + "']").length > 0) {
+                CustomerSelector.val(customerNo);
+            } else {
+                await $.ajax({
+                    type: "GET",
+                    url: "/api/Data/GetCustomerById?customerNo=" + customerNo
+                }).then(function (data) {
+                    if (data.length > 0) {
+                        var option = new Option(data[0].id, data[0].text, true, true);
+                        CustomerSelector.append(option);
+                        CustomerSelector.val(customerNo);
+                    }
+                });
+            }
+
+            CustomerSelector.trigger("change");
+        }
+
+        //調整標籤尺寸
+        function btnResizeLabel_onclick() {
+            let size, labelWidth, labelHeight;
+
+            size = $("#cboLabelSize").find(":selected").val();
+
+            switch (size) {
+                case "S":
+                    labelWidth = 5;
+                    labelHeight = 5;
+                    break;
+                case "M":
+                    labelWidth = 50;
+                    labelHeight = 50;
+                    break;
+                case "L":
+                    labelWidth = 100;
+                    labelHeight = 60;
+                    break;
+            }
+
+            $("#rulerX").css("width", _.mm2px(labelWidth) + 10);
+            $("#rulerY").css("height", _.mm2px(labelHeight) + 10);
+            $("#labelLayout").css("width", _.mm2px(labelWidth)).css("height", _.mm2px(labelHeight));
+            showRuler();
+        }
+
+        //元件清單取消選擇
+        function btnDeselectElement_onclick() {
+            let elmList = document.getElementById("labelElementsList")
+
+            for (let i = 0; i < elmList.length; i++) {
+                if (elmList.options[i].selected) {
+                    elmList.options[i].selected = false
+                }
+            }
+            resetElementEditArea();
+            selectElementOnLayout("");
+        }
+
+        //當選擇元件清單項目時,將對應的資料顯示於標籤元件編輯欄位
+        function labelElementsList_selectedChange() {
+            let selectedElmId = $("#labelElementsList").find(":selected").val();
+
+            if (selectedElmId == undefined) { return; }
+
+            selectElementOnLayout(selectedElmId);
+            fillElementDataBySelectedId(selectedElmId);
+        }
+
+        //依據選擇ID填入資料
+        function fillElementDataBySelectedId(selectedElmId) {
+            let selectedElm = labelData.elements.find(x => x.elmId === selectedElmId);
+            let elmAttributes = selectedElm.attributes;
+
+            resetElementEditArea();
+
+            $("#txtElmId").val(selectedElm.elmId);
+
+            $("#cboElType").val(selectedElm.type);
+            cboElType_onchange();
+
+            $("#cboRelationalData").val(selectedElm.relational);
+            cboRelationalData_onchange();
+
+            $("#txtElementContent").val(selectedElm.content);
+
+            $("#numDataLength").val(selectedElm.content.length);
+
+            switch (selectedElm.type) {
+                case "text":
+                    $("#cboTextFontType").val(elmAttributes.fontType);
+                    $("#numFontSize").val(elmAttributes.fontSize);
+                    break;
+                case "barcode":
+                    $("#cboBarcodeFormat").val(elmAttributes.format);
+                    $("#numBarcodeHeight").val(selectedElm.height);
+                    $("#chkShowBarcodeText").prop('checked', elmAttributes.displayValue);
+
+                    let radioBtns = document.getElementsByName("barcodeTextPosition");
+
+                    for (var i = 0; i < radioBtns.length; i++) {
+                        if (radioBtns[i].value == elmAttributes.textPosition) {
+                            radioBtns[i].checked;
+                        }
+                    }
+                    break;
+                case "qrCode":
+                    $("#numQrcodeSize").val(selectedElm.width);
+                    break;
+                case "markFrame":
+                    $("#numMarkFrameWidth").val(selectedElm.width);
+                    $("#numMarkFrameHeight").val(selectedElm.height);
+                    break;
+                case "image":
+                    changeSelectedImage(selectedElm.content);
+                    break;
+            }
+
+            $("#numElCoorX").val(selectedElm.x);
+            $("#numElCoorY").val(selectedElm.y);
+        }
+
+        //======================編輯區域
+
+        //重置元件編輯區域
+        function resetElementEditArea() {
+
+            $("#table_elementEditArea :input[type=text]").val("");
+            $("#numDataLength").val(5);
+            $("#numFontSize").val(10);
+            $("#numBarcodeHeight").val(2);
+            $("#numQrcodeSize").val(10);
+            $("#numMarkFrameWidth").val(1);
+            $("#numMarkFrameHeight").val(1);
+
+            $("#elLocSettings :input[type=number]").val(0);
+
+            document.getElementById("cboElType").selectedIndex = 0;
+            document.getElementById("cboRelationalData").selectedIndex = 0;
+
+            cboElType_onchange();
+            cboRelationalData_onchange();
+        }
+
+        //當變更元件類型時顯示對應的設定
+        async function cboElType_onchange(e) {
+            let selectedElType = $("#cboElType option:selected").val();
+
+            $(".elSettings").hide();
+
+            if (haveContentElementTypes.includes(selectedElType)) {
+                $("#rowContent").show();
+                $("#rowRelationalData").show();
+            } else {
+                $("#rowContent").hide();
+                $("#rowRelationalData").hide();
+            }
+
+            switch (selectedElType) {
+                case "text":
+                    $(".textSettings").show();
+                    break;
+                case "barcode":
+                    $(".barcodeSettings").show();
+                    break;
+                case "qrCode":
+                    $(".qrCodeSettings").show();
+                    break;
+                case "markFrame":
+                    $(".markFrameSettings").show();
+                    break;
+                case "image":
+                    $(".imageSettings").show();
+                    break;
+            }
+        }
+
+        //更改元件關聯資料設定
+        function cboRelationalData_onchange(e) {
+            let target = $("#cboRelationalData option:selected").val();
+
+            $("#txtElementContent").val("");
+
+            if (target == "none") {
+                $(".dataLenght").hide();
+                $("#txtElementContent").attr("disabled", false);
+            } else {
+                $(".dataLenght").show();
+                $("#numDataLength").val(5);
+                $("#txtElementContent").attr("disabled", true);
+                numDataLength_onchange();
+            }
+        }
+
+        //更改資料長度
+        function numDataLength_onchange(e) {
+            let dataLenght = $("#numDataLength").val();
+            let tmpData = "";
+
+            for (var i = 0; i < dataLenght; i++) {
+                tmpData = tmpData + "X";
+            }
+            $("#txtElementContent").val(tmpData);
+        }
+
+        //變更選擇圖像
+        async function changeSelectedImage(ImageId) {
+            let ImageSelector = $("#cboImageSelector");
+
+            //若已有則不新增
+            if ($("#cboImageSelector option[value='" + ImageId + "']").length > 0) {
+                ImageSelector.val(ImageId);
+            } else {
+                await $.ajax({
+                    type: "GET",
+                    url: "/api/Data/GetImageResourceById?resId=" + ImageId
+                }).then(function (data) {
+
+                    var option = new Option(data[0].id, data[0].text, true, true);
+                    ImageSelector.append(option);
+                    ImageSelector.val(ImageId);
+                });
+            }
+
+            ImageSelector.trigger("change");
+        }
+
+        //更改圖片選擇清單
+        function cboImageSelector_onchange() {
+            let resId = $("#cboImageSelector").select2('data')[0].text;
+
+            var img = new Image();
+
+            img.onload = function () {
+                imageSize.innerHTML = _.px2mm(this.width) + "x" + _.px2mm(this.height);
+            }
+            img.src = "/api/Data/GetImage?resId=" + resId;
+            edit_imagePreview.src = img.src;
+        }
+
+        //當按下元件編輯按鈕時
+        function editButtons_onclick(e) {
+            let elmId, list, elData;
+            elmId = $("#txtElmId").val().trim();
+            list = document.getElementById("labelElementsList");
+
+            if (elmId == "") {
+                alert("請輸入元件名稱");
+                return;
+            }
+
+            switch (this.id) {
+                case "btnCreateEl":
+
+                    for (let i = 0; i < list.options.length; i++) {
+                        if (list.options[i].value == elmId) {
+                            alert("元件名稱重複");
+                            return;
+                        }
+                    }
+
+                    elData = createElementData(elmId);
+                    if (typeof elData !== "undefined") {
+                        addElement(elData);
+                    }
+
+                    break;
+                case "btnUptateEl":
+                    if (list.selectedIndex == -1) {
+                        alert("請選擇修改目標元件");
+                        return;
+                    }
+
+                    elData = createElementData(elmId);
+                    if (typeof elData !== "undefined") {
+                        updateElement(elData);
+                    }
+
+                    break;
+                case "btnDelEl":
+                    deleteElement(elmId);
+                    break;
+            }
+
+        }
+
+        //建立元件資料(元件Id)
+        function createElementData(elmId) {
+            let elData = elementDataInit();
+            let content = $("#txtElementContent").val().trim();
+            let fontType = $("#cboTextFontType").val().trim();
+            let fontSize = Number($("#numFontSize").val().trim());
+            let barcodeFormat = $('#cboBarcodeFormat').find(":selected").val().trim();
+            let barcodeHeight = Number($("#numBarcodeHeight").val().trim());
+            let barcodeDisplayValue = $("#chkShowBarcodeText").prop("checked") ? true : false;
+            let barcodeTextPosition = $("input[name='barcodeTextPosition']:checked").val();
+            let qrcodeSize = Number($("#numQrcodeSize").val().trim());
+            let markFrameWidth = Number($("#numMarkFrameWidth").val());
+            let markFrameHeight = Number($("#numMarkFrameHeight").val());
+            let imageResourceId = $('#cboImageSelector').find(":selected").text().trim();
+
+            //填入通用資料
+            elData.elmId = elmId;
+            elData.type = $('#cboElType').find(":selected").val().trim();
+            elData.x = Number($("#numElCoorX").val()); //座標x
+            elData.y = Number($("#numElCoorY").val()); //座標y
+
+            if (haveContentElementTypes.includes(elData.type)) {
+                if (content == "") { alert("請輸入資料內容"); return; }
+                elData.content = content;
+                elData.relational = $('#cboRelationalData').find(":selected").val().trim();
+            }
+
+            switch (elData.type) {
+                case "text":
+                    if (fontType == "") { alert("請選擇字形"); return; }
+                    if (isNaN(fontSize) || fontSize <= 0) { alert("請輸入字體大小"); return; }
+
+                    elData.attributes = {
+                        "fontType": fontType,
+                        "fontSize": fontSize
+                    };
+
+                    break;
+                case "barcode":
+                    if (barcodeFormat == "") { alert("請選擇條碼格式"); return; }
+                    if (isNaN(barcodeHeight) || barcodeHeight <= 0) { alert("請輸入條碼高度"); return; }
+
+                    if (barcodeDisplayValue && typeof (barcodeTextPosition) == "undefined") {
+                        alert("請選取條碼文字顯示位置");
+                        return;
+                    }
+
+                    elData.attributes = {
+                        "format": barcodeFormat,
+                        "displayValue": barcodeDisplayValue,
+                        "textPosition": barcodeTextPosition
+                    };
+                    elData.height = barcodeHeight;
+
+                    break;
+                case "qrCode":
+                    if (isNaN(qrcodeSize) || qrcodeSize <= 0) { alert("請輸入尺吋"); return; }
+
+                    elData.attributes = { "ecl": "Q" };
+                    elData.width = qrcodeSize;
+                    elData.height = qrcodeSize;
+
+                    break;
+                case "markFrame":
+                    if (isNaN(markFrameWidth) || markFrameWidth <= 0) { alert("請輸入寬度"); return; }
+                    if (isNaN(markFrameHeight) || markFrameHeight <= 0) { alert("請輸入高度"); return; }
+
+                    elData.attributes = {};
+                    elData.width = markFrameWidth;
+                    elData.height = markFrameHeight;
+
+                    break;
+                case "image":
+                    if (imageResourceId == "") { alert("請選擇圖片"); return; }
+
+                    elData.content = imageResourceId;
+                    elData.attributes = {};
+                    break;
+            }
+
+            return elData;
+        }
+
+        //新增標籤元件(elData:元件設定值)
+        function addElement(elData) {
+            //繪製標籤元件
+            drawElementOnLabel(elData);
+            //將新增元件加至標籤元件清單
+            labelData["elements"].push(elData);
+            $("#labelElementsList").append($("<option></option>").text(elData.elmId));
+
+            $("#labelElementsList").val(elData.elmId);
+            labelElementsList_selectedChange();
+        }
+
+        //更新標籤元件(elData:元件設定值)
+        function updateElement(elData) {
+            var elmText, target, selectObj;
+
+            elmText = $("#labelElementsList").find(":selected");
+
+            //更新標籤物件包含的元件屬性
+            target = labelData.elements.find(x => x.elmId === elmText[0].value);
+            target.elmId = elData.elmId;
+            target.type = elData.type;
+            target.content = elData.content;
+            target.relational = elData.relational;
+            target.attributes = elData.attributes;
+            target.x = elData.x;
+            target.y = elData.y;
+            target.width = elData.width;
+            target.height = elData.height;
+            target.isQty = elData.isQty;
+            target.isSN = elData.isSN;
+
+            //重繪標籤元件
+            deleteElementOnLabel(elmText[0].value);
+            drawElementOnLabel(target);
+
+            //更新元件清單顯示名稱
+            elmText[0].textContent = elData.elmId;
+
+            //重新標示選取
+            selectObj = selectObjs.find(
+                x => x.id === elData.elmId
+            ).obj;
+            selectObj.selectize(true);
+        }
+
+        //刪除標籤元件(elData:元件設定值)
+        function deleteElement(elmId) {
+            //刪除標籤物件的元件清單
+            labelData.elements = labelData.elements.filter(x => x.elmId != elmId);
+            //刪除清單項目
+            $("#labelElementsList").find(":selected").remove();
+            //在標籤上刪除元件
+            deleteElementOnLabel(elmId);
+            resetElementEditArea();
+        }
+
+        //======================SVG元件操作
+
+        //產生文字SVG(elData:元件設定值)
+        function drawText(elData) {
+            let tmpSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            let drawing, text; //SVG.js物件
+
+            drawing = SVG.adopt(tmpSVG);
+
+            text = drawing.text(elData.content);
+            text.font({
+                size: elData.attributes.fontSize
+            })
+            text.click(elementOnLabel_onclick);
+
+            drawing.x(_.mm2px(elData.x));
+            drawing.y(_.mm2px(elData.y - 1));
+
+            return tmpSVG;
+        }
+
+        //產生一維條碼SVG(elData:元件設定值)
+        function drawBarcode(elData) {
+            let tmpSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            let drawing; //SVG.js物件
+
+            JsBarcode(tmpSVG, elData.content, {
+                format: elData.attributes.format,
+                width: 1, //此為單一條碼寬度,設為1表示最窄
+                height: _.mm2px(elData.height), //條碼高度
+                margin: 0, //外距
+                displayValue: elData.attributes.displayValue, //是否顯示文字
+                textPosition: elData.attributes.textPosition  //文字顯示位置
+            });
+
+            drawing = SVG.adopt(tmpSVG);
+            drawing.x(_.mm2px(elData.x));
+            drawing.y(_.mm2px(elData.y));
+
+            return tmpSVG;
+        }
+
+        //產生二維條碼SVG(elData:元件設定值)
+        function drawQrcode(elData) {
+            let tmpSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            let tmpDiv = document.createElement("div");
+            let drawing; //SVG.js物件
+
+            var qrcode = new QRCode({
+                content: elData.content,
+                width: _.mm2px(elData.width),
+                height: _.mm2px(elData.height),
+                padding: 0,
+                color: "#000000",
+                background: "#ffffff",
+                ecl: "Q"
+            });
+            //output svg element to div
+            tmpDiv.innerHTML = qrcode.svg();
+            tmpSVG = tmpDiv.lastElementChild;
+
+            drawing = SVG.adopt(tmpSVG);
+            drawing.x(_.mm2px(elData.x));
+            drawing.y(_.mm2px(elData.y));
+
+            return tmpSVG;
+        }
+
+        //產生麥頭外框SVG
+        function drawMarkFrame(elData) {
+            let tmpSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            let drawing = SVG.adopt(tmpSVG); //SVG.js物件
+            let width, height, p1, p2, p3, p4, polygon;
+
+            width = _.mm2px(elData.width);
+            height = _.mm2px(elData.height);
+
+            //定義範圍
+            drawing.size(width, height);
+            drawing.x(_.mm2px(elData.x));
+            drawing.y(_.mm2px(elData.y));
+
+            p1 = [width / 2, 0];
+            p2 = [width, height / 2];
+            p3 = [width / 2, height];
+            p4 = [0, height / 2];
+
+            polygon = drawing.polygon();
+            polygon.plot([p1, p2, p3, p4]);
+            polygon.fill('none').stroke({ width: 3 });
+            polygon.click(elementOnLabel_onclick);
+
+            return tmpSVG;
+        }
+
+        //產生圖片SVG(elData:元件設定值)
+        function drawImage(elData) {
+            let tmpSVG = document.createElementNS("http://www.w3.org/2000/svg", "image");
+            let src = "/api/Data/GetImage?resId=" + elData.content;
+            let img = SVG.adopt(tmpSVG); //SVG.js物件
+
+            //讀取圖片時建立選取物件
+            img.loaded(function (loader) {
+                let selectObj;
+
+                img.width(loader.width);
+                img.height(loader.height);
+                selectObj = createSelectObj(img.node);
+                selectObjs.push({ "id": img.node.id, "obj": selectObj });
+            });
+
+            img.x(_.mm2px(elData.x));
+            img.y(_.mm2px(elData.y));
+            img.load(src);
+
+            return tmpSVG;
+        }
+
+        //建立區域選擇物件
+        function createSelectObj(svgElm) {
+            let bBox, label, selectObj;
+
+            bBox = SVG.adopt(svgElm).bbox();
+            label = SVG.adopt(labelLayout);
+
+            selectObj = label.rect(
+                bBox.width,
+                bBox.height
+            ).move(
+                svgElm.x.baseVal.value,
+                svgElm.y.baseVal.value
+            ).fill('none');
+
+            if (svgElm.lastChild != null) {
+                if (svgElm.lastChild.tagName == "text") {
+                    selectObj.move(
+                        svgElm.x.baseVal.value,
+                        svgElm.y.baseVal.value + 8);
+                }
+            } else {
+
+            }
+
+            return selectObj;
+        }
+
+        //在標籤上繪製元件(elData:元件設定值)
+        function drawElementOnLabel(elData) {
+            let svgElm, selectObj;
+
+            switch (elData.type) {
+                case "text":
+                    svgElm = drawText(elData);
+                    break;
+                case "barcode":
+                    svgElm = drawBarcode(elData);
+                    break;
+                case "qrCode":
+                    svgElm = drawQrcode(elData);
+                    break;
+                case "markFrame":
+                    svgElm = drawMarkFrame(elData);
+                    break;
+                case "image":
+                    svgElm = drawImage(elData);
+                    break;
+            }
+
+            //在標籤layout中繪製元件
+            labelLayout.appendChild(svgElm);
+            labelLayout.lastElementChild.id = elData.elmId;
+            labelLayout.lastElementChild.classList.add("elementOnLabel");
+            //除圖片物件外建立選擇框
+            if (svgElm.tagName == "svg") {
+                selectObj = createSelectObj(svgElm);
+                selectObjs.push({ "id": svgElm.id, "obj": selectObj });
+            }
+        }
+
+        //刪除標籤上的元件(id:元件識別碼)
+        function deleteElementOnLabel(id) {
+            var selectObj;
+
+            selectObj = selectObjs.find(
+                x => x.id === id
+            ).obj;
+            selectObj.selectize(false);
+
+            selectObjs = selectObjs.filter(x => x.id != id);
+
+            document.getElementById(selectObj.node.id).remove();
+            document.getElementById(id).remove();
+        }
+
+        //清除所有元件
+        function clearAllElement() {
+            labelData.elements = []; //清空標籤元件列表
+            selectObjs = [];
+            $("#labelElementsList option").remove();
+            $("#labelLayout").children("svg").remove();
+        }
+
+        //======================滑鼠事件
+
+        //當點選標籤上的元件時
+        function elementOnLabel_onclick(e) {
+            //selectElementOnLayout(e.target.id);
+        }
+
+        //在繪圖區選取元件
+        function selectElementOnLayout(target) {
+            let selectedObj;
+
+            selectObjs.forEach(function (item) {
+                item.obj.selectize(false);
+            });
+
+            //選取指定元件
+            selectedObj = selectObjs.find(
+                x => x.id === target
+            );
+
+            if (selectedObj != undefined) {
+                selectedObj.obj.selectize();
+            }
+        }
+
+        pageInit();
+
+    });//jQuery End
+
+</script>

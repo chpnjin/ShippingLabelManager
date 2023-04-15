@@ -1,0 +1,317 @@
+﻿@{Layout = "~/Views/Shared/_Layout.cshtml";}
+
+<div id="settings_sidebar">
+    <button class="tablinks">圖片資源</button>
+</div>
+<div id="settings_content">
+    <div id="settings_images">
+        <fieldset id="imageSettings_upload" class="groupBox fieldset_imageSettings">
+            <legend><span>上傳新圖</span></legend>
+            <table id="table_uploadImage">
+                <colgroup>
+                    <col style="width:40px">
+                    <col style="width:auto">
+                    <col style="width:50px">
+                </colgroup>
+                <tr>
+                    <td>名稱</td>
+                    <td><input type="text" id="txtImgUploadId" /></td>
+                    <td rowspan="2"><button id="btnUploadImg">上傳</button></td>
+                </tr>
+                <tr>
+                    <td>來源</td>
+                    <td><input type="file" accept="image/*" id="txtImgFilePath" /></td>
+                </tr>
+            </table>
+        </fieldset>
+        <fieldset id="imageSettings_active" class="groupBox">
+            <legend><span>圖片編輯操作</span></legend>
+            <table id="table_editImage">
+                <colgroup>
+                    <col style="width:40px">
+                    <col style="width:auto">
+                    <col style="width:50px">
+                </colgroup>
+                <tr>
+                    <td>名稱</td>
+                    <td>
+                        <input type="text" id="txtImgId" disabled />
+                    </td>
+                    <td>
+                        <button id="btnDeleteImage">刪除</button>
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
+        <fieldset id="imageSettings_preview" class="groupBox">
+            <legend><span>預覽</span></legend>
+            <img id="settings_imagePreview" />
+        </fieldset>
+        <div id="imageSettings_list" class="groupBox">
+            <table border="1" id="table_imageList" class="fancytable">
+                <colgroup>
+                    <col />
+                    <col style="width:100px" />
+                </colgroup>
+                <thead>
+                    <tr class="headerRow">
+                        <th>名稱</th>
+                        <th>尺寸(mm)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import * as _ from "../../lib/tools.js";
+
+    //jQuery Start
+    $(function () {
+        //頁面初始化
+        function pageInit() {
+            //註冊事件
+            $("#btnUploadImg").click(UploadImage);
+            $("#btnDeleteImage").click(txtImgId_onclick);
+            refreshImageList();
+        }
+
+        //註冊事件---清單項目點選
+        function addTableRowEvents() {
+            let rows = document.getElementById("table_imageList")
+                .getElementsByTagName("tbody")[0];
+
+            rows.addEventListener("mouseover", onMouseOverToImageList);
+            rows.addEventListener("mouseout", onMouseOutFromImageList);
+            rows.addEventListener("click", onMouseClickImageList);
+        }
+
+        //上傳圖片
+        async function UploadImage() {
+            let imageId, imageFile, uploadSucceed, updateImgResourceSucceed;
+
+            imageId = $("#txtImgUploadId").val();
+            imageFile = document.getElementById("txtImgFilePath").files[0];
+
+            if (imageId == "") { alert("請輸入名稱"); return; }
+            if (imageFile == undefined) { alert("請選擇檔案"); return; }
+
+            if (await checkIdDuplicate(imageId)) {
+                alert("資源名稱重複!");
+                return;
+            }
+
+            uploadSucceed = await uploadImage(imageFile);
+
+            if (uploadSucceed) {
+                updateImgResourceSucceed = await updateResourceDefn(imageId, imageFile.name, "Image");
+            } else {
+                alert("圖片上傳失敗,請重新操作");
+                return;
+            }
+
+            if (updateImgResourceSucceed) {
+
+            } else {
+                alert("圖片資源檔儲存異常");
+            }
+
+            refreshImageList();
+        }
+
+        //[API呼叫]=========================
+
+        //檢查ID是否重複
+        async function checkIdDuplicate(imageId) {
+            let result = false;
+
+            await $.ajax({
+                type: "GET",
+                url: "/api/Data/CkeckResourceExist?resId=" + imageId,
+                success: function (response) {
+                    result = response;
+                }
+            });
+
+            return result;
+        }
+
+        //上傳圖片並回傳結果(參數:名稱,圖檔)
+        async function uploadImage(file) {
+            let img, result;
+
+            img = new FormData();
+            img.append("file", file);
+
+            await $.ajax({
+                type: "POST",
+                url: "/api/Data/UploadImage",
+                contentType: false, //網頁要送到Server的資料型態
+                processData: false, //上傳檔案不額外處理數據
+                data: img,
+                success: function (response) {
+                    result = response;
+                }
+            });
+            return result;
+        }
+
+        //更新資源定義資料
+        async function updateResourceDefn(resId, resFileName, resType) {
+            let result = false;
+            let data = {
+                "resId": resId,
+                "resFileName": resFileName,
+                "resType": resType
+            }
+
+            await $.ajax({
+                type: "PUT",
+                url: "/api/Data/PutResourceDefn",
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                success: function (response) {
+                    result = response;
+                }
+            });
+            return result;
+        }
+
+        //重讀圖片資源清單
+        async function refreshImageList() {
+            let table = document.getElementById("table_imageList");
+
+            $("#txtImgId").val("");
+            $("#table_imageList tbody tr").remove();
+            document.getElementById("settings_imagePreview").src = "";
+
+            await $.ajax({
+                url: "/api/Data/GetImageResourceList?forAutoComplete=false",
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+
+                    data.forEach(function (element) {
+                        //建立新資料列
+                        let tbody = document.getElementById("table_imageList")
+                            .getElementsByTagName("tbody")[0];
+
+                        let row = tbody.insertRow();
+                        let cell_imgName = row.insertCell(0);
+                        let cell_imgSize = row.insertCell(1);
+                        let img = new Image();
+
+                        //奇數偶數行樣式不同
+                        if (table.rows.length % 2 == 0) {
+                            row.classList.add("dataRowEven");
+                        } else {
+                            row.classList.add("dataRowOdd");
+                        }
+
+                        //填入圖片名稱與尺寸
+                        cell_imgName.innerHTML = element.resId;
+                        img.onload = function () {
+                            cell_imgSize.innerHTML = _.px2mm(this.width) + "x" + _.px2mm(this.height);
+                        }
+                        img.src = "/api/Data/GetImage?resId=" + element.resId;
+                    });
+                }
+            });
+            addTableRowEvents();
+        }
+
+        //刪除圖片
+        async function deleteImage(imgId) {
+
+            await $.ajax({
+                type: "DELETE",
+                url: "/api/Data/DeleteImage?imgId=" + imgId,
+                success: function (result) {
+                    debugger;
+                    if (result) {
+                        alert("刪除成功");
+                    } else {
+                        alert("刪除失敗,請聯絡系統管理員");
+                    }
+                    refreshImageList();
+                }
+            });
+        }
+
+        //[滑鼠事件]=========================
+
+        //當滑鼠遊標移至圖片清單項目
+        function onMouseOverToImageList(e) {
+            if (e.target.tagName == "TD") {
+                e.target.parentElement.classList.add("onMouseOver");
+            }
+        }
+
+        //當滑鼠遊標移出圖片清單項目
+        function onMouseOutFromImageList(e) {
+            if (e.target.tagName == "TD") {
+                e.target.parentElement.classList.remove("onMouseOver");
+            }
+        }
+
+        //當滑鼠點選圖片項目時
+        function onMouseClickImageList(e) {
+            let selectedRow, targetImgId;
+
+            markSelectedImageItem(e.target);
+
+            selectedRow = document.getElementsByClassName("selected")[0];
+
+            if (!selectedRow) {
+                $("#txtImgId").val("");
+                settings_imagePreview.src = "";
+            } else {
+                targetImgId = selectedRow.cells[0].textContent;
+
+                $("#txtImgId").val(targetImgId);
+                settings_imagePreview.src = "/api/Data/GetImage?resId=" + targetImgId;
+            }
+
+            e.stopImmediatePropagation();
+        }
+
+        //標記所選擇的圖片項目
+        function markSelectedImageItem(item) {
+            let classList = item.parentElement.classList;
+
+            if (classList.contains("selected")) {
+                item.parentElement.classList.remove("selected");
+            } else {
+                item.parentElement.classList.add("selected");
+            }
+
+            $("tr").each(function (idx, element) {
+                if (element != item.parentElement) {
+                    element.classList.remove("selected");
+                }
+            });
+        }
+
+        //[文字事件]=========================
+
+        function txtImgId_onclick() {
+            let id;
+
+            id = $("#txtImgId").val();
+
+            if (id === "") {
+                alert("請選擇圖片");
+                return;
+            } else {
+                if (confirm("確認刪除圖片?(名稱:" + id + ")")) {
+                    deleteImage(id);
+                }
+            }
+        }
+
+        pageInit();
+    });//jQuery End
+</script>

@@ -1,0 +1,215 @@
+﻿@{Layout = "~/Views/Shared/_Layout.cshtml";}
+<div id="print">
+    <!--搜尋-->
+    <div id="print_search">
+        <table id="table_printLabel">
+            <tr>
+                <td>訂單單號</td>
+                <td><input type="text" id="input_orderNo" value="@ViewData["orderNo"]" /></td>
+            </tr>
+            <tr>
+                <td>客戶</td>
+                <td><input type="text" id="input_customerNo" value="@ViewData["customerNo"]"></td>
+            </tr>
+            <tr>
+                <td>製令單號</td>
+                <td><input type="text" id="input_moNo" value="@ViewData["moNo"]"></td>
+            </tr>
+            <tr>
+                <td rowspan="2">出貨日期</td>
+                <td><span>從 </span><input type="date" id="input_shippingDate_Start" /></td>
+            </tr>
+            <tr>
+                <td><span>到 </span><input type="date" id="input_shippingDate_End" /></td>
+            </tr>
+            <tr>
+                <td>
+                    <button id="btnClearPrintSearch">清除</button>
+                </td>
+                <td>
+                    <button id="btnPrintSearch">查詢</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <!--訂單列表-->
+    <div id="print_orderLists">
+        <table id="table_orderList" class="fancytable">
+            <colgroup>
+                <col style="width:80px" />
+            </colgroup>
+            <thead class="headerRow">
+                <tr>
+                    <th>出貨日期</th>
+                    <th>訂單單號</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <!--標籤Layout-->
+    <div id="print_layout">
+        <svg id="print_labelSample">
+
+        </svg>
+    </div>
+    <!--列印資訊區-->
+    <div id="print_info">
+        <table id="table_labelInfo">
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<script>
+    //jQuery Start
+    $(function () {
+        //頁面初始化
+        function pageInit() {
+            //註冊事件
+            $("#btnPrintSearch").click(getOrderList);
+            $("#btnClearPrintSearch").click(btnClearPrintSearch_onClick);
+        }
+
+        function addOrderListEvent() {
+            let rows = document.getElementById("table_orderList")
+                .getElementsByTagName("tbody")[0];
+
+            rows.addEventListener("mouseover", onMouseOverToOrderList);
+            rows.addEventListener("mouseout", onMouseOutFromOrderList);
+            rows.addEventListener("click", onMouseClickOrderList);
+        }
+
+        //[API呼叫]=========================
+        function getOrderList() {
+            let url, searchConditions, table;
+            table = document.getElementById("table_orderList");
+
+            url = "/api/Data/GetOrders";
+            searchConditions = {
+                "orderNo": $("#input_orderNo").val(),
+                "customerNo": $("#input_customerNo").val(),
+                "moNo": $("#input_moNo").val(),
+                "shippingDate_Start": $("#input_shippingDate_Start").val(),
+                "shippingDate_End": $("#input_shippingDate_End").val()
+            };
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: searchConditions,
+                dataType: "json",
+                success: function (data) {
+
+                    $("#table_orderList tbody tr").remove();
+
+                    data.forEach(function (order) {
+                        //建立新資料列
+                        let tbody = document.getElementById("table_orderList").getElementsByTagName("tbody")[0];
+
+                        let row = tbody.insertRow();
+                        let cell_shippingDate = row.insertCell(0);
+                        let cell_orderNo = row.insertCell(1);
+
+                        //奇數偶數行樣式不同
+                        if (table.rows.length % 2 == 0) {
+                            row.classList.add("dataRowEven");
+                        } else {
+                            row.classList.add("dataRowOdd");
+                        }
+
+                        cell_shippingDate.innerHTML = order.shippingDate;
+                        cell_orderNo.innerHTML = order.orderNo;
+                    });
+
+                    addOrderListEvent();
+                }
+            });
+        }
+
+        //藉客戶與訂單取得對應的標籤ID
+        async function getLabelId(customerNo, orderNo) {
+            let labelId = "";
+
+            let url = "/api/Data/GetLabelIdByCustomerAndOrderNo?";
+            url += "customerNo=" + customerNo + "&";
+            url += "orderNo=" + orderNo;
+
+            await $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                success: function (response) {
+                    labelId = response;
+                }
+            });
+
+            return labelId;
+        }
+
+        //[按鈕事件]=========================
+        function btnClearPrintSearch_onClick() {
+
+        }
+
+        //[滑鼠事件]=========================
+
+        //當滑鼠遊標移至訂單清單
+        function onMouseOverToOrderList(e) {
+            if (e.target.tagName == "TD") {
+                e.target.parentElement.classList.add("onMouseOver");
+            }
+        }
+
+        //當滑鼠遊標移出訂單清單
+        function onMouseOutFromOrderList(e) {
+            if (e.target.tagName == "TD") {
+                e.target.parentElement.classList.remove("onMouseOver");
+            }
+        }
+
+        //當滑鼠點選訂單清單項目
+        function onMouseClickOrderList(e) {
+            let selectedRow;
+
+            markSelectedOrderList(e.target);
+
+            selectedRow = document.getElementsByClassName("selected")[0];
+
+            if (!selectedRow) {
+                //$("#txtImgId").val("");
+                //settings_imagePreview.src = "";
+            } else {
+                //targetImgId = selectedRow.cells[0].textContent;
+
+                //$("#txtImgId").val(targetImgId);
+                //settings_imagePreview.src = "/api/Data/GetImage?resId=" + targetImgId;
+            }
+
+            e.stopImmediatePropagation();
+        }
+
+        //標記所選擇的訂單項目
+        function markSelectedOrderList(item) {
+            let classList = item.parentElement.classList;
+
+            if (classList.contains("selected")) {
+                item.parentElement.classList.remove("selected");
+            } else {
+                item.parentElement.classList.add("selected");
+            }
+
+            $("tr").each(function (idx, element) {
+                if (element != item.parentElement) {
+                    element.classList.remove("selected");
+                }
+            });
+        }
+
+        pageInit();
+    });//jQuery End
+</script>

@@ -1,0 +1,84 @@
+﻿#settings_sidebar {
+    margin: 0px;
+    width: 100px;
+    background-color: cornsilk;
+}
+
+    #settings_sidebar .tablinks {
+        display: block;
+        background-color: inherit;
+        color: black;
+        padding: 22px 16px;
+        width: 100%;
+        border: none;
+        outline: none;
+        text-align: left;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+#settings_content {
+    flex: 1;
+}
+/*圖片資源管理分頁*/
+#settings_images {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: start;
+}
+
+#table_uploadImage {
+    width: 100%;
+}
+
+    #table_uploadImage input {
+        width: 100%;
+    }
+
+#table_editImage {
+    width: 100%;
+}
+
+    #table_editImage input {
+        width: 100%;
+    }
+
+.fieldset_imageSettings {
+    width: 400px;
+}
+
+/*預覽外框*/
+#imageSettings_preview {
+    flex: 1;
+}
+
+/*圖片清單外框*/
+#imageSettings_list {
+    position: relative;
+    flex-basis: 100%;
+    width: 640px;
+    overflow-y: auto;
+}
+/*圖片清單*/
+#table_imageList {
+    position: absolute;
+    left: 5px;
+    width: 99%;
+}
+
+    /*圖片清單固定表頭*/
+    #table_imageList thead tr th {
+        position: sticky;
+        top: 0;
+        background-color: #FDE890;
+    }
+
+/*預覽畫面*/
+#settings_imagePreview {
+    position: relative;
+    left: 9px;
+    width: 380px;
+    height: 380px;
+}
